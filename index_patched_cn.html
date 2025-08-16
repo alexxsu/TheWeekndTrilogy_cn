@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>三部曲 - 叙事深度解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- Top Banner Styles --- */
+        #top-banner {
+            position: fixed;
+            top: 1rem; 
+            left: 0;
+            width: 100%;
+            height: 1.25rem; /* 20px */
+            padding-top: calc(6px + env(safe-area-inset-top));
+            height: calc(1.25rem + env(safe-area-inset-top));
+            box-sizing: content-box;
+            z-index: 5000;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem; /* 40px */
+        }
+
+        .banner-diamond {
+            width: 8px;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            animation: banner-pulse 10s infinite ease-in-out;
+        }
+
+        .banner-diamond:nth-child(1) { animation-delay: 0s; }
+        .banner-diamond:nth-child(2) { animation-delay: 0.7s; }
+        .banner-diamond:nth-child(3) { animation-delay: 1.4s; }
+
+        @keyframes banner-pulse {
+            0%, 100% {
+                transform: rotate(45deg) scale(1);
+                background-color: rgba(255, 255, 255, 0.1);
+                box-shadow: none;
+            }
+            25% {
+                transform: rotate(45deg) scale(1.8);
+                background-color: rgba(255, 255, 255, 0.2);
+                box-shadow: none;
+            }
+            50% {
+                transform: rotate(45deg) scale(1.8);
+                background-color: #ffffff;
+                box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+            }
+            75% {
+                transform: rotate(45deg) scale(1);
+                background-color: #ffffff;
+                box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+            }
+        }
+
+
+        /* --- Pre-loader Styles --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh; /* Fallback for older browsers */
+            height: 100svh;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.75s ease-out, visibility 0.75s ease-out;
+            visibility: visible;
+            opacity: 1;
+        }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .preloader-diamonds {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .preloader-diamonds .diamond {
+            width: 20px;
+            height: 20px;
+            background-color: #6b7280;
+            transform: rotate(45deg);
+            margin: 0 25px;
+            animation: light-up 0.9s infinite ease-in-out;
+        }
+
+        .preloader-diamonds .diamond:nth-child(2) { animation-delay: 0.3s; }
+        .preloader-diamonds .diamond:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes light-up {
+            0%, 100% { background-color: #6b7280; transform: rotate(45deg) scale(1); box-shadow: none; }
+            33% { background-color: #ffffff; transform: rotate(45deg) scale(1.3); box-shadow: 0 0 25px rgba(255,  255, 255, 0.7); }
+            66% { background-color: #6b7280; transform: rotate(45deg) scale(1); box-shadow: none; }
+        }
+        
+        /* --- Drag Navigation Title List --- */
+        #drag-nav-titles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh; /* Fallback for older browsers */
+            height: 100svh;
+            z-index: 4500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            pointer-events: none;
+        }
+        
+        #drag-nav-titles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .drag-nav-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #6b7280;
+            transform: scale(1);
+            background: none;
+        }
+
+        .drag-nav-title.active-snap {
+            transition: color 0.3s ease, transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            transform: scale(1.5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        @keyframes text-shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(255, 255, 255, 0.25); }
+        }
+        
+        @keyframes ken-burns {
+            0% { transform: scale(1.25) translate(0, 0); }
+            50% { transform: scale(1.3) translate(-1%, 1%); }
+            100% { transform: scale(1.25) translate(0, 0); }
+        }
+
+        html { 
+            scroll-behavior: smooth; 
+            background-color: #000;
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #000; 
+            color: #E0E0E0; 
+            user-select: none;
+            padding-top: env(safe-area-inset-top);
+        }
+        .container { scroll-snap-type: y mandatory; overflow-y: scroll; height: 100vh; }
+        .container::-webkit-scrollbar { display: none; }
+        .section { height: 100vh; width: 100%; }
+        .content-wrapper { height: 100vh; overflow-y: auto; transition: opacity 0.4s ease, transform 0.4s ease; }
+
+        #drag-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100svh;
+            background-image: url('https://i.postimg.cc/1zLXbW8H/9a38825862b3a02c8e3b2ec1da638d4e.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: 4400; /* Below the titles overlay */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            filter: blur(8px) brightness(0.4);
+            -webkit-filter: blur(8px) brightness(0.4);
+        }
+
+        body.is-dragging #drag-background {
+            opacity: 1;
+            visibility: visible;
+        }
+        body.is-dragging .content-wrapper {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+        body.is-dragging #page-nav {
+            transform: translateY(-50%) scale(1.1);
+            filter: brightness(1.2);
+        }
+        body.is-dragging #drag-nav-titles {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .section { display: flex; align-items: center; justify-content: center; position: relative; scroll-snap-align: start; overflow: hidden; }
+        .background-image { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; 
+            transition: opacity 1.5s ease-out; 
+            transform: scale(1.25); 
+            opacity: 0.15;
+            animation: ken-burns 30s infinite ease-in-out;
+        }
+        .section.active .background-image { 
+            opacity: 0.25; 
+        }
+        .vignette { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,1) 100%); z-index: 2; }
+        .top-vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        #samples::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 3;
+        }
+
+        .content-wrapper { position: relative; z-index: 10; width: 100%; max-width: 1000px; padding: 2rem 1rem; }
+        @media (min-width: 1536px) {
+            .content-wrapper { max-width: 1400px; }
+        }
+        .content-wrapper::-webkit-scrollbar { width: 6px; }
+        .content-wrapper::-webkit-scrollbar-track { background: transparent; }
+        .content-wrapper::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 3px; }
+        .content-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+        .album-art { border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); margin: 1.5rem auto 0 auto; }
+        
+        .fancy-title { font-weight: 900; color: transparent; background-clip: text; -webkit-background-clip: text; }
+        .title-main { background-image: linear-gradient(to right, #808080, #ef4444, #f59e0b, #808080); animation: text-shimmer 6s linear infinite; background-size: 300% auto;}
+        .title-hob { background-image: linear-gradient(to right, #b3b3b3, #666666, #b3b3b3); animation: text-shimmer 5s linear infinite; background-size: 200% auto;}
+        .title-thu { background-image: linear-gradient(to right, #facc15, #f59e0b, #facc15); animation: text-shimmer 5s linear infinite; background-size: 200% auto;}
+        .title-eos { background-image: linear-gradient(to right, #ef4444, #b91c1c, #ef4444); animation: text-shimmer 5s linear infinite; background-size: 200% auto;}
+        .title-samples { background-image: linear-gradient(to right, #94a3b8, #cbd5e1, #94a3b8); animation: text-shimmer 5s linear infinite; background-size: 200% auto;}
+        .title-epilogue { background-image: linear-gradient(to right, #5a5a5a, #a7a7a7, #5a5a5a); animation: text-shimmer 6s linear infinite; background-size: 200% auto;}
+
+        details { background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; margin-bottom: 1rem; transition: all 0.4s ease; text-align: left; }
+        .song-list details {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .song-list details.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        summary { list-style: none; cursor: pointer; padding: 1rem 1.5rem; font-weight: 700; font-size: 1.1rem; display: flex; justify-content: flex-start; align-items: center;
+  gap: 0.75rem; }
+        summary::-webkit-details-marker { display: none; }
+        
+        summary::before { 
+            content: '+'; 
+            font-size: 2rem; 
+            line-height: 0;
+            display: inline-block;
+            transform: rotate(0deg);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
+        details[open] summary::before { 
+            transform: rotate(45deg); 
+        }
+        
+        .details-content {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.5s cubic-bezier(0.25, 0.8, 0.5, 1);
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            line-height: 1.7; 
+            color: #b0b0b0;
+        }
+        .details-content p { margin-bottom: 1rem; }
+        
+        #hob details[open] { border-color: rgba(156, 163, 175, 0.7); box-shadow: 0 0 20px rgba(156, 163, 175, 0.1); }
+        #hob summary::before { color: #9ca3af; }
+        #hob details[open] summary::before { color: #d1d5db; }
+        #hob .analysis-heading { color: #d1d5db; }
+
+        #thursday details[open] { border-color: rgba(245, 158, 11, 0.7); box-shadow: 0 0 20px rgba(245, 158, 11, 0.1); }
+        #thursday summary::before { color: #f59e0b; }
+        #thursday details[open] summary::before { color: #facc15; }
+        #thursday .analysis-heading { color: #facc15; }
+
+        #eos details[open] { border-color: rgba(239, 68, 68, 0.7); box-shadow: 0 0 20px rgba(239, 68, 68, 0.1); }
+        #eos summary::before { color: #ef4444; }
+        #eos details[open] summary::before { color: #f87171; }
+        #eos .analysis-heading { color: #f87171; }
+        
+        #samples details[open] { border-color: rgba(100, 116, 139, 0.7); box-shadow: 0 0 20px rgba(100, 116, 139, 0.1); }
+        #samples summary::before { color: #94a3b8; }
+        #samples details[open] summary::before { color: #cbd5e1; }
+        #samples .analysis-heading { color: #cbd5e1; }
+
+
+        #page-nav { position: fixed; top: 50%; right: 1.5rem; transform: translateY(-50%); z-index: 4000; cursor: ns-resize; transition: transform 0.3s ease, filter 0.3s ease; }
+        .nav-bar-container { 
+            display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+            padding: 0.75rem;
+            border-radius: 9999px;
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: pulse-glow 4s infinite ease-in-out;
+        }
+        .nav-bar {
+            width: 10px; height: 90px;
+            border-radius: 5px; cursor: pointer; border: none;
+            display: flex; flex-direction: column; overflow: hidden;
+            padding: 0;
+            transition: filter 0.5s ease, transform 0.3s ease;
+            filter: grayscale(80%) brightness(0.5);
+        }
+        .nav-bar.active { filter: grayscale(0%) brightness(1); transform: scale(1.1); }
+        .nav-bar:hover { filter: grayscale(0%) brightness(1); }
+        .color-block { width: 100%; flex-grow: 1; }
+        
+        .nav-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            opacity: 0.5; transition: opacity 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
+            background-color: #fff;
+            border: none;
+        }
+        .nav-dot.active { opacity: 1; transform: scale(1.2); }
+        .nav-dot:hover { opacity: 1; }
+        #nav-bar-epilogue { background-color: #a7a7a7; }
+
+        /* Vinyl Record Icon Styles for Navigation */
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: #fff;
+            transition: transform 0.3s ease;
+        }
+        .nav-icon.active {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+        .nav-icon.active svg {
+            animation: spin 4s linear infinite;
+        }
+        .nav-icon:hover {
+            opacity: 1;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .album-choice-link .album-art { transition: transform 0.4s ease, box-shadow 0.4s ease; }
+        .album-choice-link:hover .album-art { transform: scale(1.05) translateY(-10px) perspective(1000px) rotateY(5deg); }
+        .album-choice-link:nth-child(1):hover .album-art { box-shadow: 0 40px 50px -20px rgba(179, 179, 179, 0.3); }
+        .album-choice-link:nth-child(2):hover .album-art { box-shadow: 0 40px 50px -20px rgba(245, 158, 11, 0.3); }
+        .album-choice-link:nth-child(3):hover .album-art { box-shadow: 0 40px 50px -20px rgba(239, 68, 68, 0.3); }
+
+        .section .album-art { transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease, filter 0.4s ease; }
+        .section .album-art:hover, .section .album-art:active { transform: scale(1.08) translateY(-8px) perspective(1200px) rotateY(3deg) rotateX(3deg); filter: brightness(1.05); }
+        #hob .album-art:hover, #hob .album-art:active { box-shadow: 0 40px 50px -20px rgba(179, 179, 179, 0.4); }
+        #thursday .album-art:hover, #thursday .album-art:active { box-shadow: 0 40px 50px -20px rgba(245, 158, 11, 0.4); }
+        #eos .album-art:hover, #eos .album-art:active { box-shadow: 0 40px 50px -20px rgba(239, 68, 68, 0.4); }
+
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .section.active .reveal { opacity: 1; transform: translateY(0); }
+        .section.active .reveal-1 { transition-delay: 0.2s; }
+        .section.active .reveal-2 { transition-delay: 0.4s; }
+        .section.active .reveal-3 { transition-delay: 0.6s; }
+        .section.active .reveal-4 { transition-delay: 0.8s; }
+        .section.active .reveal-5 { transition-delay: 1.0s; }
+        
+        .footer { text-align: center; padding: 2rem; font-size: 0.875rem; color: rgba(255, 255, 255, 0.4); }
+
+        #audio-player-container {
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        #audio-player-container:hover {
+            background-color: rgba(0,0,0,0.25);
+            border-color: rgba(255,255,255,0.1);
+        }
+        #audio-player-container .time-display {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #audio-player-container:hover .time-display {
+            opacity: 1;
+        }
+
+        /* Styles for the Samples Section */
+        .samples-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            max-width: 800px;
+        }
+        @media (min-width: 768px) {
+            .samples-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .sample-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: left;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        .sample-item:hover {
+            transform: scale(1.03);
+            background-color: rgba(255, 255, 255, 0.07);
+        }
+        .sample-item-title {
+            font-weight: 700;
+            color: #E0E0E0;
+            margin-bottom: 0.25rem;
+        }
+        .sample-item-artist {
+            font-style: italic;
+            color: #a0a0a0;
+        }
+
+    </style>
+<style>
+/* === ChatGPT patch: mobile full-bleed background + centering === */
+html, body { height: 100%; }
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.container,
+.section,
+.content-wrapper {
+  height: 100vh;   /* fallback */
+  height: 100dvh;  /* modern mobile browsers */
+}
+#drag-background,
+.background-image {
+  height: 100vh;   /* fallback */
+  height: 100dvh;
+  background-size: cover;
+  background-position: center;
+}
+.section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  scroll-snap-align: start;
+  overflow: hidden;
+}
+/* === End patch === */
+</style>
+
+<style>
+/* === Patch: First slide interactivity cue + icon to the left === */
+@keyframes pulse-text {
+  0%, 100% { color: #9ca3af; transform: scale(1); }
+  50% { color: #ffffff; transform: scale(1.1); }
+}
+#intro h3 { animation: pulse-text 2s infinite ease-in-out; }
+
+/* Enhance album hover feedback */
+.album-choice-link .album-art {
+  transition: transform 0.4s ease, box-shadow 0.4s ease, filter 0.4s ease;
+}
+.album-choice-link:hover .album-art {
+  transform: scale(1.1);
+  filter: brightness(1.08);
+  box-shadow: 0 0 20px rgba(255,255,255,0.35);
+}
+
+/* Normalize summary icon (now on the left via ::before) */
+summary::before { 
+  content: '+'; 
+  font-size: 1.6rem; 
+  line-height: 1; 
+  display: inline-block;
+  transform: rotate(0deg);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+details[open] summary::before { transform: rotate(45deg); }
+
+
+</style>
+<style>
+
+/* === Patch v2: icon centering square === */
+summary::before { 
+  content: '+';
+  width: 1.25rem;
+  height: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  line-height: 1;
+  transform: rotate(0deg) translateY(1px);
+  transform-origin: 50% 50%;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  flex-shrink: 0;
+}
+details[open] summary::before { transform: rotate(45deg) translateY(1px); }
+
+</style>
+<style>
+
+/* === Patch v2: reliable pulse on 'Select an Act' === */
+@keyframes pulse-text-v2 {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+.select-act-pulse {
+  animation: pulse-text-v2 1.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+</style>
+<style>
+
+
+#drag-nav-titles-list .drag-nav-title:last-child {
+  
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+</style>
+<style>
+
+/* === Patch v4: Gradient elegant divider lines === */
+#drag-nav-titles-list .drag-nav-title:first-child::after {
+  content: "";
+  display: block;
+  height: 2px;
+  margin: 0.75rem auto;
+  width: 60%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 80%);
+}
+#drag-nav-titles-list .drag-nav-title:nth-child(4)::after {
+  content: "";
+  display: block;
+  height: 2px;
+  margin: 0.75rem auto;
+  width: 60%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 80%);
+}
+
+</style>
+</head>
+<body>
+
+<div id="drag-background"></div>
+
+<div id="top-banner">
+    <div class="banner-diamond"></div>
+    <div class="banner-diamond"></div>
+    <div class="banner-diamond"></div>
+</div>
+
+<div id="preloader">
+    <div class="preloader-diamonds">
+        <div class="diamond"></div>
+        <div class="diamond"></div>
+        <div class="diamond"></div>
+    </div>
+</div>
+
+<div id="drag-nav-titles">
+    <div id="drag-nav-titles-list">
+        <div class="drag-nav-title" data-target="#intro">三部曲</div>
+        <div class="drag-nav-title" data-target="#hob">House of Balloons</div>
+        <div class="drag-nav-title" data-target="#thursday">Thursday</div>
+        <div class="drag-nav-title" data-target="#eos">Echoes of Silence</div>
+        <div class="drag-nav-title" data-target="#epilogue">终章</div>
+        <div class="drag-nav-title" data-target="#samples">采样</div>
+    </div>
+</div>
+
+
+<nav id="page-nav">
+    <div class="nav-bar-container">
+        <button class="nav-dot" id="nav-return-top" data-target="#intro"></button>
+        <button class="nav-bar" id="nav-bar-hob" data-target="#hob">
+            <div class="color-block" style="background-color: #333333;"></div>
+            <div class="color-block" style="background-color: #4d4d4d;"></div>
+            <div class="color-block" style="background-color: #666666;"></div>
+            <div class="color-block" style="background-color: #808080;"></div>
+            <div class="color-block" style="background-color: #999999;"></div>
+            <div class="color-block" style="background-color: #b3b3b3;"></div>
+        </button>
+        <button class="nav-bar" id="nav-bar-thu" data-target="#thursday">
+            <div class="color-block" style="background-color: #facc15;"></div>
+            <div class="color-block" style="background-color: #f9a825;"></div>
+            <div class="color-block" style="background-color: #f59e0b;"></div>
+            <div class="color-block" style="background-color: #d97706;"></div>
+            <div class="color-block" style="background-color: #b45309;"></div>
+            <div class="color-block" style="background-color: #92400e;"></div>
+            <div class="color-block" style="background-color: #78350f;"></div>
+        </button>
+        <button class="nav-bar" id="nav-bar-eos" data-target="#eos">
+            <div class="color-block" style="background-color: #7f1d1d;"></div>
+            <div class="color-block" style="background-color: #991b1b;"></div>
+            <div class="color-block" style="background-color: #b91c1c;"></div>
+            <div class="color-block" style="background-color: #dc2626;"></div>
+            <div class="color-block" style="background-color: #ef4444;"></div>
+            <div class="color-block" style="background-color: #f87171;"></div>
+        </button>
+        <button class="nav-dot" id="nav-bar-epilogue" data-target="#epilogue"></button>
+        <button class="nav-icon" id="nav-bar-samples" data-target="#samples" aria-label="Go to Samples">
+             <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM256 352a96 96 0 1 1 0-192 96 96 0 1 1 0 192zM128 256a128 128 0 1 0 256 0 128 128 0 1 0 -256 0zM256 192a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
+        </button>
+    </div>
+</nav>
+
+<div class="container">
+
+    <section id="intro" class="section active" data-color="#a7a7a7" data-gradient="linear-gradient(to right, #a7a7a7, #ffffff, #a7a7a7)">
+        <img src="https://i.postimg.cc/1tSfgYSt/67c10c9cafeca5dfdad75f94a37480c6.jpg"
+             alt="A moody, black and white photo of The Weeknd." class="background-image"
+             onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/333333?text=Image+Not+Found';">
+        <div class="vignette"></div>
+        <div class="top-vignette"></div>
+        <div class="content-wrapper">
+            <div class="text-center py-8">
+                <div>
+                    <h1 class="text-4xl sm:text-5xl md:text-7xl font-black fancy-title title-main reveal reveal-1 pb-2">三部曲</h1>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl text-gray-300 reveal reveal-2">坠入现代享乐主义的回响寂静</h2>
+                    <p class="text-base sm:text-lg text-gray-400 mt-6 max-w-3xl mx-auto reveal reveal-3">
+                        The Weeknd的《Trilogy》是一部连贯的、三幕剧般的悲剧，记录了一个现代伊卡洛斯的崛起与陨落。它以《House of Balloons》开始，这是一封进入享乐主义世界的诱人请柬。这场堕落在《Thursday》中继续，其中的快感变得酸涩，沦为愤世嫉俗的例行公事。最终，《Echoes of Silence》作为残酷的戒断反应，让主角面对他行为所造成的空虚。
+                    </p>
+                </div>
+                <div class="mt-8 sm:mt-12 reveal reveal-4">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-400 mb-6 select-act-pulse">选择篇章</h3>
+                    <div class="flex flex-row justify-center items-center gap-4 sm:gap-8">
+                        <a href="#hob" class="album-choice-link">
+                            <img src="https://t2.genius.com/unsafe/1458x0/https%3A%2F%2Fimages.genius.com%2Fda5c113dd66b79605b1a74911dbb4576.1000x1000x1.png" alt="House of Balloons Album Art" class="w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 album-art">
+                        </a>
+                        <a href="#thursday" class="album-choice-link">
+                            <img src="https://t2.genius.com/unsafe/1458x0/https%3A%2F%2Fimages.genius.com%2F1d4e1b8dd401906009d931e7a7c6a3bb.1000x1000x1.png" alt="Thursday Album Art" class="w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 album-art">
+                        </a>
+                        <a href="#eos" class="album-choice-link">
+                            <img src="https://t2.genius.com/unsafe/1458x0/https%3A%2F%2Fimages.genius.com%2Fa83a29dd26a6e4fe50bba0ef25c7bb19.1000x1000x1.png" alt="Echoes of Silence Album Art" class="w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 album-art">
+                        </a>
+                    </div>
+                </div>
+
+                <div id="audio-overview" class="mt-8 sm:mt-12 w-full max-w-2xl mx-auto reveal reveal-5">
+                    <div id="audio-player-container" class="border border-transparent rounded-full p-2 flex items-center gap-4">
+                        <audio id="trilogy-audio" src="Audio_Overview.mp3"></audio>
+                        <button id="play-pause-btn" class="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-transparent text-white rounded-full focus:outline-none transition-transform duration-200 hover:scale-110 active:scale-100">
+                            <svg class="w-6 h-6" id="play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+                            <svg class="w-6 h-6 hidden" id="pause-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                        </button>
+                        <div id="current-time" class="text-sm text-gray-400 font-mono time-display">0:00</div>
+                        <div id="seek-bar-container" class="w-full h-1 bg-white bg-opacity-20 cursor-pointer group rounded-full">
+                            <div id="seek-bar-progress" class="h-full bg-white relative rounded-full">
+                                <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            </div>
+                        </div>
+                        <div id="duration" class="text-sm text-gray-400 font-mono time-display">0:00</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 1: House of Balloons -->
+    <section id="hob" class="section" data-color="#b3b3b3" data-gradient="linear-gradient(to right, #b3b3b3, #666666, #b3b3b3)">
+        <img src="https://i.postimg.cc/hPyt0tLV/1fbc6a0550a980fa1a20a765da118f99.jpg"
+             alt="A grainy, black and white photo of a person amidst balloons in a bathtub." class="background-image"
+             onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/333333?text=Image+Not+Found';">
+        <div class="vignette"></div>
+        <div class="content-wrapper">
+            <div class="text-center pt-16">
+                <h1 class="text-5xl md:text-7xl fancy-title title-hob reveal reveal-1">House of Balloons</h1>
+                <p class="text-lg text-gray-300 mt-4 max-w-xl mx-auto reveal reveal-2">《Trilogy》的第一幕，《House of Balloons》，是进入主角世界的一封诱人请柬。它确立了中心人物、他的掠夺手段，以及他所栖居的那个迷人却又根本空洞的环境。</p>
+                <img src="https://t2.genius.com/unsafe/1458x0/https%3A%2F%2Fimages.genius.com%2Fda5c113dd66b79605b1a74911dbb4576.1000x1000x1.png"
+                     alt="House of Balloons Album Art"
+                     class="w-40 h-40 md:w-48 md:h-48 album-art reveal reveal-3"
+                     onerror="this.onerror=null;this.src='https://placehold.co/256x256/111111/555555?text=HOB';">
+            </div>
+            <div class="song-list mt-8 reveal reveal-4">
+                <details><summary>High for This</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>“High For This”是整个《Trilogy》的开篇之作。它起到了双重邀请的作用：一是主角向一位天真女性发出的邀请，二是The Weeknd向听众发出的邀请。它是通往一个世界的大门，在这个世界里，所有后续的体验都以沉醉为前提。这首歌从一开始就设定了交往的条款，明确表示真诚的连接是不可能的，取而代之的是一种化学物质诱导的存在状态，这是忍受接下来一切所必需的。</p><h3 class="analysis-heading">关键歌词分析</h3><p>开篇的歌词，"You don't know what's in store / But you know what you're here for," 立即建立了一种权力不平衡和交易动态。这里有一种对目的——欲望、逃避现实——的默契理解，但却明确地隐瞒了信息，这是一种关键的操控策略。主角将自己呈现为进入未知世界的向导。副歌部分则阐述了他世界观的核心论点："Bring your love, baby, I can bring my shame / Bring the drugs, I can bring my pain"。这不是一个相互愉悦的承诺，而是一个共同功能失调的契约。爱被用来交换羞耻，毒品被用来交换痛苦，从而将药物使用确立为亲密关系的主要中介和应对内心动荡的机制。有些解读认为，这首歌根本不是关于一个女孩，而是一段内心独白，其中“The Weeknd”这个人格正在引诱艺术家Abel Tesfaye拥抱这种毁灭性的生活方式。</p><h3 class="analysis-heading">人声表现与制作</h3><p>由Dream Machine主导的制作，营造出一种真切的悬念感。一种氛围感的器乐渐强，在第一句歌词的鼓点落下前积累了紧张感，这种音效模仿了药物生效时的冲击感。打击乐沉重而回响，背景中的和声既宏大又带着令人不寒而栗的疏离感。在这样的背景下，Tesfaye的人声表现却出人意料地“抚慰人心”且“完美平衡”。他的演绎克制而令人安心，与他提议的险恶本质形成了鲜明而故意的对比。这种人声层面的不协调感是一个关键工具，它诱使听众产生一种虚假的安全感，正如主角对他的受害者所做的那样。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌立即在亲密、逃避现实和药物滥用之间建立了不可分割的联系。它将沉醉呈现为一种连接的先决条件，而非娱乐选择，是体验身体亲近所必需的过滤器。主角承认他在这场相遇中带来了自己的“痛苦”和“羞耻”，这将其对毒品的依赖框定为一种自我疗愈的方式。这确立了成瘾不仅仅是一种生活方式的选择，而是角色核心的心理驱动力，源于麻痹既有情感创伤的需求。</p></div></div></details>
+                <details><summary>What You Need</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>继最初的邀请之后，“What You Need”是诱惑行为的进行时。主角识别出他目标的弱点——她那段不尽如人意的恋情——并将自己定位为解决方案。这首歌的叙事功能是展示他高超的操控技巧，特别是他将一次掠夺性的示好重塑为满足一种深层需求的能力，从而模糊了欲望与依赖之间的界限。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌词叙事围绕着一个三角恋展开，但主角试图利用而非处理这个局面。他向女方辩称，她现任男友仅仅是她想要的，一个肤浅的选择，而他则代表了她真正需要的，一种本质的、原始的满足。这一论点建立在她沉醉的状态之上，因为他暗示是毒品揭示了她真实的欲望。这是一种典型的情感操控，利用对方软弱和感知改变的时刻，来断言自己的重要性并创造一种依赖感。</p><h3 class="analysis-heading">人声表现与制作</h3><p>这首歌的制作最初由Jeremy Rose操刀，围绕着Aaliyah的“Rock the Boat”中一段鬼魅般、降调处理的采样构建。使用像Aaliyah这样的R&B偶像是一种颠覆行为；它将一种与该流派不同时代相关的熟悉声音，扭曲成更黑暗、更具威胁性的东西。由此产生的音景被描述为“神秘地冷酷”，伴随着“碾碎的节拍”和“深沉的放克合成器”，营造出一种朦胧、迷失方向的氛围。Tesfaye的嗓音“性感”而“甜腻”，这种表演使他“怪诞的不雅提议”听起来无可否认地诱人。他声音的性感掩盖了歌词的掠夺意图，这是定义该项目的“人声不协调”的一个完美例子。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌深入探讨了相互依赖（codependency）和自恋型操控（narcissistic manipulation）的主题。主角表现出深刻的同理心缺失，他将女方的情感状态不视为应被尊重的事物，而是为了满足自己而可被利用的弱点。他利用她感知到的情感空虚来满足自己的生理欲望，展示了一种将他人仅仅视为满足自己工具的世界观。</p></div></div></details>
+                <details><summary>House of Balloons / Glass Table Girls</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首分为两部分的长篇史诗是派对混乱、恐怖的核心，也是混音带前半部分的叙事高潮。歌曲结构模仿了一次吸毒体验：第一部分“House of Balloons”代表了狂乱、欣快的巅峰，而第二部分“Glass Table Girls”则描绘了偏执、肮脏的崩溃。乐趣的表象彻底破碎，揭示了主角世界核心那个幽闭恐怖、毒品驱动的噩梦。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌曲前半部分由绝望、反复的坚称“This is a happy house”所定义。这并非陈述事实，而是在派对失控、人们想要离开时一种疯狂的自我说服。主角害怕孤独，他重复的“Oh this is fun”是抵抗自身痛苦的咒语。突兀地过渡到“Glass Table Girls”后，焦点转向派对的肮脏机制，明确提及在玻璃桌上使用可卡因（"Bring the 707 out"），以及一长串享乐行为。</p><h3 class="analysis-heading">人声表现与制作</h3><p>歌曲前半部分的制作是反讽手法的杰作，围绕着英国后朋克乐队Siouxsie and the Banshees的“Happy House”一段突出采样构建。歌曲欢快、叮当作响的旋律与黑暗、险恶的合成器底流和阴郁的歌词并置，创造出一种极度不安的氛围。Tesfaye的人声表演也反映了歌曲结构的崩塌；他开始时用一种高亢、近乎“雌雄莫辨的假声”演唱，听起来空灵如梦，但随着歌曲过渡，他的声音退化为低沉、险恶的饶舌，“咕哝着含糊不清的诅咒”。节拍转换（beat switch）本身被形容为一场“雪崩”——一次冰冷而雷鸣般的崩塌，进入“粗暴的打击乐和低频的翻腾”，在音效上代表了派对堕入淫乱的深渊。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是对一次躁狂发作后紧随严重崩溃的精湛音效描绘。“House of Balloons”捕捉了那种用享乐主义来抵御潜在抑郁的强迫性、狂乱能量，一种对快乐的绝望表演。“Glass Table Girls”则体现了随之而来的偏执、攻击性和情感空虚。制作上有意营造出“幽闭恐怖”感，旨在让听众感觉墙壁正在逼近，这是对严重焦虑或恐慌症发作的完美音效隐喻。</p></div></div></details>
+                <details><summary>The Morning</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首歌代表了冷酷的白昼，是派对混乱之后清醒反思的时刻。快感已过，客人已散，主角独自一人面对他存在的严酷现实：一个建立在奔波和与夜生活行业女性空洞、交易式交往基础上的生活。这是专辑享乐主义盔甲上的第一道主要裂痕。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌词描绘了一幅生动的宿醉残局，如 "Got the walls kickin' like they're six months pregnant" 和 "Drinking Alizé with our cereal for breakfast"。随后，歌曲转向对他野心的坦率反思，将他自己的艺术奔波与他常光顾的脱衣舞女的工作直接相提并论，两者都统一在“money is the motive”这句冷酷的口号下。这种比较揭示了一种愤世嫉俗的自我意识；他将自己的艺术和她们的性工作视为同一枚交易硬币的两面。</p><h3 class="analysis-heading">人声表现与制作</h3><p>与歌词内容形成鲜明对比的是，由Doc McKinney和Illangelo操刀的制作被描述为“宏大而丰富”且“出人意料地明亮”。它以“流动的蓝调吉他连复段和温暖、诱人的和弦”为特色，创造出一种近乎乐观的声音。Tesfaye的嗓音柔和而旋律优美，一种美丽而疏离的演绎，漂浮在阴郁的叙事之上。这种并置是这首歌的核心艺术成就，凸显了他处境中深刻的孤独和道德模糊性。声音的美丽使得生活方式的丑陋感觉更加荒凉。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“The Morning”是一幅描绘躁狂、药物驱动的高潮后常出现的抑郁状态的肖像。欣快感已蒸发，留下一个被痛苦的清醒填满的空虚。这是一个深刻自我意识的时刻，主角看到自己的生活被剥去光鲜的伪装，沦为一种情感贫瘠、重复的奔波。然而，这一刻的清醒并未引向改变的决心，而是对他空洞现实的一种顺从接受。</p></div></div></details>
+                <details><summary>Wicked Games</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这是专辑中对不安全感和情感创伤最原始的告白。混音带早期展示的所有虚张声势和掠夺性自信都烟消云散，揭示出一个破碎的男人，绝望地渴求任何形式的情感，即使是制造出来的、花钱买来的。他明确地寻求谎言，作为对他根深蒂固的痛苦和自我价值感缺失的慰藉。</p><h3 class="analysis-heading">关键歌词分析</h3><p>副歌是整个项目的核心主题："Bring your love, baby, I could bring my shame / Bring the drugs, baby, I could bring my pain"。这两句完美地阐述了专辑的核心动态：将性和毒品作为麻痹情感动荡的交易手段。恳求，“So just tell me you love me / Even though you don't love me,” 是对他空虚的令人心碎的承认。他是如此渴望情感，以至于他宁愿选择一个安慰性的谎言，也不愿面对他孤立的痛苦真相，这揭示了驱动他享乐主义的深刻自信缺失。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上，音乐冰冷地稀疏而富有氛围感，创造出一个黑暗、空旷的音景，将情感的重担完全放在Tesfaye的人声表现上。他的声音痛苦而脆弱，而标志性的、无词的“Wooahh oooah”钩子是情感表达的神来之笔，传达了一种言语无法捕捉的萦绕、荒凉的空虚感。官方音乐视频强化了这一主题，将他描绘成笼罩在阴影中，这是他自卑和破碎的视觉隐喻。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“Wicked Games”是现代音乐中对抑郁和低自我价值感最直接、最有力的探索之一。歌名中的“wicked games”指的是自我欺骗的破坏性循环，利用他人作为情感支撑，以及通过药物和无爱的性寻求短暂解脱。这首歌描绘了一个从根本上破碎的角色，他主动寻求虚假，暗示了一种心理状态，即他自身孤独的真相太过痛苦而无法承受。</p></div></div></details>
+                <details><summary>The Party & The After Party</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首长达七分半钟的巨作，是专辑的叙事核心，以两个截然不同的乐章概括了一次毒品驱动的邂逅的全过程。“The Party”详述了最初的诱惑，毒品是换取陪伴的货币，而“The After Party”则堕入 bleak、偏执和残酷诚实的余波之中。</p><h3 class="analysis-heading">关键歌词分析</h3><p>前半部分是为一名女性提供可卡因以换取其陪伴的直接叙事，邀请她上楼到一个私人房间。后半部分则标志着音调急转直下，变成一段漫无边际、醉醺醺的忏悔。歌词 "They don't want my love, they just want my potential" 揭示了他对自己事业初露锋芒阴影下人际关系的根深蒂固的愤世嫉俗和厌倦。最令人不寒而栗的是，那句咕哝的威胁，“If she stops, then I might get violent,” 是对他冷静外表下潜藏的虐待和攻击倾向的惊人而具争议性的一瞥，在那一刻，风度翩翩的浪子面具滑落，露出了某种可怕的东西。</p><h3 class="analysis-heading">人声表现与制作</h3><p>歌曲的两个部分在音效和人声上截然不同。“The Party”建立在独立流行乐队Beach House的“Master of None”一段突出、朦胧的采样之上，营造出一种梦幻、欣快的氛围。Tesfaye在这里的嗓音诱人而热情。“The After Party”则剥离了采样，留下一个更稀疏、更阴沉的音景。他的人声演绎变得疲惫、漫无边际和忏悔式，反映了从表演性的社交高潮到私人绝望状态的转变。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是对成瘾在社交互动中的作用及其心理后果的全面研究。它展示了使用药物作为降低抑制、促进性接触的工具，随后不可避免地陷入偏执、自怜和情感孤立的崩溃。暗示暴力的歌词是主角危险精神状态的一个关键指标。它暗示了一种以控制为至上的人格，而失去控制——或被抛弃的威胁——会引发一种深度的攻击性和虐待冲动。</p></div></div></details>
+                <details><summary>Coming Down</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首歌将听众直接带入毒品戒断时原始、痛苦和迷失方向的体验中。这是一个强烈悔恨和脆弱的时刻，主角被迫面对他成瘾的周期性以及它所培养的情感依赖。这是为前面歌曲中短暂快感付出的生理和心理代价。</p><h3 class="analysis-heading">关键歌词分析</h3><p>核心歌词，“I always want you when I'm coming down,” 是一句毁灭性的诚实承认。它揭示了他所声称的对伴侣的“爱”或“需要”并非真情实感，而实际上是戒断症状。在戒断的痛苦中，他渴望安慰和连接来填补化学物质造成的空虚，并将这种绝望的需求投射到一个女人身上。他承认自己试图戒毒但无法成功，这是对他无力战胜成瘾的直接承认。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上有意营造出不安感，被描述为“令人毛骨悚然的”、“忧郁的”和“怪异的”，伴随着“冷酷”的器乐，旨在让听众感到偏执和紧张。其中包含的来自日本动漫《Fate/stay night》的声音采样，增强了这首歌的幻觉和迷失方向的氛围，模糊了现实与药物诱导的朦胧之间的界限。Tesfaye的人声表演是他最具情感共鸣的一次，充满了 palpable 的悔恨和痛苦，完美捕捉了一个“堕落王子”在自己制造的痛苦深渊中的声音。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“Coming Down”是对成瘾心理折磨的 stark 和不妥协的描绘。戒断阶段的特征是急性焦虑、严重抑郁，以及对情感寄托的压倒性渴望。这首歌巧妙地展示了成瘾如何扭曲和腐蚀真挚的情感，使得主角（和听众）无法区分真实的喜爱和由依赖驱动的对安慰的需求。它有力地描绘了追求化学快感最终如何导致一种深刻的情感破产状态。</p></div></div></details>
+                <details><summary>Loft Music</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>在“Coming Down”的原始脆弱之后，“Loft Music”标志着向自信诱惑者形象的急剧回归，但这次带有一种更公然的愤世嫉俗和掠夺性色彩。主角将一名女性带到他的阁楼，完全清醒并明确地表明自己作为腐化影响者的角色，引领她进入一个道德将被抛弃的世界。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌词“I think you lost your morals, girl / But it's okay, 'cause you don't need 'em where we're going” 是一句令人不寒而栗的直接意图声明。他不仅仅是这种生活方式的参与者；他是其建筑师，主动引导他人进入他的虚无主义世界观。这首歌充满了性露骨和苛求的歌词，将这次邂逅更多地框定为一场为他满足而进行的表演，而非共同的体验，强化了他对控制的需求。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上再次使用了乐队Beach House的采样，这次是他们的歌曲“Gila”。采样被循环和扭曲，创造出一种快节奏但不安的氛围，一种被描述为既“悲伤又欢快”的声音。这种音效上的二元性完美地捕捉了他生活方式中空洞的兴奋。Tesfaye的人声演绎自信而 commanding，与前几首歌的脆弱形成鲜明对比。结尾处加长的部分，层次分明的和声，具有催眠般的“神性”，将听众带入一种 trance-like 状态，这反映了他对受害者所施展的诱惑力。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌探讨了通过施加控制和腐化他人来获得权力感的心理需求。通过“摧毁”某人并以自己堕落的形象重塑他们，主角断言了一种支配地位，这用来掩盖他自己根深蒂固的不安全感和自我厌恶。这是一个捕食者的肖像，他不是在相互连接中找到认同，而是在他人的堕落和占有中，这是他内心空虚的一种黑暗表现。</p></div></div></details>
+                <details><summary>The Knowing</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>“The Knowing”是《House of Balloons》毁灭性的高潮和主题性结论。这是一个绝对情感清晰的时刻，主角面对伴侣的不忠。然而，他的反应并非愤怒或嫉妒的激情爆发，而是一种冷酷、疏离、近乎理智化的痛苦。这最后一次心碎巩固了他的愤世嫉俗，并完成了他向一个纯粹、麻木的疏离生物的转变。</p><h3 class="analysis-heading">关键歌词分析</h3><p>反复出现的、萦绕心头的副歌“I know everything”并非指责，而是一种权力的断言。他对话不感兴趣；他感兴趣的是在他们共同的痛苦中展示自己的智力优越。通过“知道”，他感觉自己赢了，即使他已经输了。歌词“Now you're trying to be somebody I can love / But I can't”揭示了背叛几乎是无关紧要的；他自身的情感创伤已经使他无论如何都无法去爱。他冷酷复仇的承诺——“You're gonna have to cry yourself to sleep”——以一种令人不寒而栗的平静传达，远比任何愤怒的爆发都更可怕。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上围绕着梦幻流行先驱Cocteau Twins的“Cherry-Coloured Funk”一段扭曲、空灵的采样构建，这是The Weeknd声音的一个关键影响。这一选择赋予了这首歌一种美丽、近乎天堂般的质感，与歌词的苦涩形成了鲜明、痛苦的对比。由“空洞的复古节拍和摇摆的合成器”构成的音景，创造出一种迷失方向、如梦似幻的氛围。Tesfaye呈现了一场“极其深情的表演”，剥去了层层药物驱动的朦胧，揭示出一种原始、直击人心的痛苦，既能引起共鸣又极度不安。这首歌的音乐视频将这种情感分裂视觉化为一场字面上的两性宇宙战争，最终以一颗行星分裂为二告终——这是一个对无法修复关系的有力隐喻。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“The Knowing”是对抑郁和情感麻木作为一种创伤反应的精湛描绘。面对深刻的背叛，主角没有去处理自己的感受，而是退缩到一种理智的疏离状态。他的“知道”成了一面盾牌，一种控制一个让他无能为力的局面的方式。这种情感解离（emotional dissociation）是一种主要的防御机制，保护他免受现实的压倒性痛苦，但也确保了他再也无法建立健康的连接。</p></div></div></details>
+                <details><summary>Twenty Eight (Bonus Track)</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>作为《Trilogy》合集的增补曲目，“Twenty Eight”是对《House of Balloons》事件的反思性尾声。这首歌写于最初的混音带获得了一批狂热追随者之后，探讨了他新获得的、尽管仍是匿名的名声所带来的后果。闯入他家的“女孩”是他观众和媒体的隐喻，他们现在可以前所未有地接触到他曾经私密的痛苦和放荡世界。</p><h3 class="analysis-heading">关键歌词分析</h3><p>核心主题是对个人空间的侵犯。“This house is not a home to you / But you decide to go ahead and lay down” 是对那些对他和他的故事感到有所有权的人的直接指责。歌词“Did you have to tell your friends about the way I got you screaming my name?” 是一段精彩的元评论，直接指向了听和分享他音乐的行为本身。他在责备他的粉丝传播他黑暗世界的私密细节，尽管这正是让他成名的行为。</p><h3 class="analysis-heading">人声表现与制作</h3><p>歌曲以一段简单、平和的钢琴旋律开始，与主专辑密集的电子制作形成鲜明对比。这营造出一种更传统的民谣感觉，暗示着一个安静、清醒的反思时刻。随着歌曲的推进，《Trilogy》声音中熟悉的黑暗、氛围感合成器被层层叠加进来，代表了他的公众形象对这个私密时刻的侵入。Tesfaye的人声表演富有动感，从安静的悔恨语气转变为强大、原始的沮丧。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是对伴随隐私丧失而来的焦虑和偏执的一次深刻而令人心痛的探索。主角的家，曾经的罪恶巢穴，现在变成了一个鱼缸。先前针对亲密伴侣的“信任问题”，现在扩展到了他的全体观众，模糊了个人生活和公众消费之间的界限。这是一个艺术家开始意识到，他商品化的痛苦本身，如今成了一个他无法逃脱的牢笼的声音。</p></div></div></details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Thursday -->
+    <section id="thursday" class="section" data-color="#f59e0b" data-gradient="linear-gradient(to right, #facc15, #f59e0b, #facc15)">
+        <img src="https://i.postimg.cc/sDD2ShhV/ab6c781b8edf6d7f8ccbaff28d7a26f6.jpg"
+             alt="A woman with blonde hair in a bathtub with black balloons." class="background-image"
+             onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/333333?text=Image+Not+Found';">
+        <div class="vignette"></div>
+        <div class="content-wrapper">
+            <div class="text-center pt-16">
+                <h1 class="text-5xl md:text-7xl fancy-title title-thu reveal reveal-1">Thursday</h1>
+                <p class="text-lg text-gray-300 mt-4 max-w-xl mx-auto reveal reveal-2">《Trilogy》的第二幕，《Thursday》，将其焦点从《House of Balloons》广阔的享乐主义景观，转移到对一段单一、极度有毒关系的微观、幽闭恐怖的审视，这段关系围绕着一个反复出现的角色Valerie展开。</p>
+                <img src="https://t2.genius.com/unsafe/1458x0/https%3A%2F%2Fimages.genius.com%2F1d4e1b8dd401906009d931e7a7c6a3bb.1000x1000x1.png"
+                     alt="Thursday Album Art"
+                     class="w-40 h-40 md:w-48 md:h-48 album-art reveal reveal-3"
+                     onerror="this.onerror=null;this.src='https://placehold.co/256x256/111111/555555?text=Thursday';">
+            </div>
+            <div class="song-list mt-8 reveal reveal-4">
+                <details><summary>Lonely Star</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>“Lonely Star”是这张混音带核心的、毁灭性关系的正式介绍。主角识别出一个脆弱、孤立的女性——即标题中的“Lonely Star”，后来被确认为Valerie——并以救世主的姿态出现。叙事功能是建立他们之间扭曲的安排条款：他会给予她情感和他的世界的一瞥，但只能在他严格、控制性的时间表上，特别是在星期四。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌曲以Valerie的声音开场，一段采样立即确立了她的顺从角色：“I belong to you... My body is yours”。主角随后利用她所陈述的脆弱性，用诸如“It seems like pain and regret are your best friends... baby, I could be your best friend”这样的歌词来挑逗她。这并非提供真诚的安慰，而是一个精心策划的举动，旨在用一种对他的新依赖来取代她现有的痛苦。建立“星期四”规则是他控制的核心机制。星期四是最接近“The Weeknd”（周末，他的人格）但又不是它的一天，这是他提供的诱人但最终无法获得的亲近感的隐喻。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作以Valerie痛苦、脱离实体的声音开始，随后“一阵急促的鼓点”标志着主角的到来，这是一个音效提示，表明他正进入她的生活以扰乱它。Tesfaye的人声演绎柔和，近乎“呜咽”，一种假装同情的表演，掩盖了他歌词中控制和掠夺的本质。这种人声选择是他操控的关键工具，使他的承诺听起来真诚，即使它们的设计初衷是为了诱捕。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是自恋型虐待（narcissistic abuse）动态的临床案例研究。主角进行“爱情轰炸”（love bombing），针对一个他认为被“痛苦和悔恨”所孤立的个体，提供一个肤浅的、包罗万象的解决方案，旨在创造依赖。 “星期四”规则是间歇性强化（intermittent reinforcement）的经典策略，这是一种强大的心理控制形式，使受害者持续处于焦虑和希望的状态。一些解读也认为整首歌可以被解读为成瘾的隐喻，主角代表了药物诱人但最终毁灭性的本质。</p></div></div></details>
+                <details><summary>Life of the Party</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首歌记录了对Valerie的主动腐化过程。在建立立足点后，主角现在着手将她重塑成自己的形象，将这个曾经的“好女孩”引入他重度吸毒的世界。她转变为“派对的生命”并非解放，而是一种征服，一个瓦解她身份的过程，以便她能更整齐地融入他毁灭性的生活方式。</p><h3 class="analysis-heading">关键歌词分析</h3><p>副歌，“If you wanna go downtown with the drugs in your body,” 是这首歌核心的、腐化的邀请。主角说服Valerie他有“好意”，同时积极鼓励她屈服于同伴压力，吸食可卡因和药丸。当她变得沉醉并“放松”后，他将她的转变归功于自己，将她新发现的狂野视为自己的创造。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上，以“强劲的节拍伴随着蜿蜒、不安的声音”和突出的电吉他为特色，赋予了这首歌一种黑暗、近乎“恐怖电影”的感觉。音乐既诱人又危险，完美地反映了歌词内容。这首歌采样了合成器流行乐队Thieves Like Us的“Drugs in My Body”，这是对其主题核心的直接而 unapologetic 的致意。在某些地方，Tesfaye的声音经过音效扭曲，增加了歌曲不安和险恶的氛围。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“Life of the Party”明确地详述了使用毒品作为操控和控制工具的过程。它探讨了同伴压力和身份侵蚀的主题。Valerie的转变是一个 grim 的描绘，展示了一个人的个性和价值观如何在一个有毒、虐待性的关系中被系统性地瓦解。她成为“派对的生命”并非她找到自由的标志，而是她迷失自我于他的世界和她 burgeoning 的成瘾之中。</p></div></div></details>
+                <details><summary>Thursday</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这张混音带的同名曲目，旨在将关系中核心的、压迫性的规则法典化并加以强化。这是对主角情感波动和他对绝对控制需求的 stark 探索。这首歌的叙事功能是定义他与Valerie连接的窒息、幽闭恐怖的边界，明确表示他们的纽带只存在于他所构建的 confines 之中。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌词“I loved her, today, because it's Wednesday, I won't be late” 是对他有条件情感的 chillingly 精确表达；他的“爱”并非一种恒定状态，而是一种仅与他们每周相遇的期待相关的 fleeting 情感。歌词“Make sure you are thirsty on Thursday”不是建议而是命令，要求她在情感和身体上都准备好为他的需求服务。她因为想念他而在另一天给他打电话犯下“错误”的轶事，强调了他控制的僵化以及她因在指定时间外寻求连接而受到的惩罚。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上营造出一种黑暗、氛围感和空旷的音景。Tesfaye的嗓音被描述为“优雅”，并浸透在厚重的混响（reverb）中，这种音效选择创造出一种广阔、空旷的空间感。这种制作极具反讽意味；声音的宽敞感反而凸显了歌词中限制性、监禁般的本质。优美、回响的人声飘荡在一首关于被困在一周中某一天的歌曲里。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是通过间歇性强化机制实施情感虐待的 stark 描绘。通过将所有的情感和关注限制在一个单一、可预测的日子里，主角让Valerie处于一个期待、短暂满足和长期焦虑的永恒循环中。这种策略旨在培养极端的依赖性并侵蚀受害者的自我价值，因为她在他生活中的全部价值被缩减为一个24小时的窗口。这是心理控制在其最 methodical 形式下的肖像。</p></div></div></details>
+                <details><summary>The Zone (feat. Drake)</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>“The Zone”代表了叙事中情感残忍和背叛的终极行为。在与Valerie身体亲密的同时，主角在情感和精神上完全缺席，利用她的身体作为他对另一个无名女性欲望的替代品。这是他的情感疏离变成一种主动的、武器化的虐待形式的时刻。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌词“I'll be making love to her through you / So let me keep my eyes closed” 是The Weeknd音乐作品中最毁灭性冷酷和明确的情感不忠告白之一。这是一个直接的声明，将Valerie贬低为一个纯粹的物理对象，一个承载他对别人幻想的容器。歌名中的“the zone”指的是他沉醉的状态，他用lean和其他毒品创造的化学泡沫，使他能够达到这种深度的解离。Drake的客串部分补充了这一主题，提供了一个关于与脱衣舞女邂逅和这种生活方式中普遍存在的麻木感的疏离叙事。</p><h3 class="analysis-heading">人声表现与制作</h3><p>由Doc McKinney和Illangelo操刀的制作，巧妙地潜伏着危险。底层的节拍是一个简单、稳定的脉冲，模仿了人类心跳的“Lub Dub”声，创造出一种虚假的亲密感和生命感，而这完全被歌词内容所背叛。整体氛围黑暗、冰冷和不祥。Tesfaye的人声表演是一大亮点，尤其是在“AND I DON'T GIVE A DAAAAMMMMMNNN”这句歌词上原始、 belted 的高音，这是一个纯粹、挑衅的虚无主义时刻，展示了他的人声力量，同时也强调了他绝对的情感空虚。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是对解离（dissociation）作为严重情感创伤症状的深刻探索。主角是如此无法建立真诚的连接，以至于他必须退回到幻想中来表演亲密行为。这是一个完全情感异化（emotional alienation）的肖像，即使是性行为的身体动作也变成了一种空洞、脱离实体的体验。他是自己生活中的一个幽灵，即使在最亲密的时刻也无法在场。</p></div></div></details>
+                <details><summary>The Birds, Pt. 1</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首歌起到了一个自我意识的、先发制人的警告作用。主角明确承认自己的毒性以及他无法承诺或回报真挚情感。他警告Valerie不要爱上他，此举与其说是为了保护她，不如说是为了免除自己对未来不可避免会造成的痛苦的责任。</p><h3 class="analysis-heading">关键歌词分析</h3><p>核心歌词，“So don't you fall in love / Don't make me make you fall in love... with a n**** like me,” 是一个精心计算的免责声明。这是一种操控策略，将未来心碎的责任推到她身上；如果她受伤了，那将是她没有听从他警告的错。他用自己是“鸟”的比喻——一种无法驯服的生物，当季节变化时终将飞走——来将自己对承诺的恐惧和情感的短暂性框定为他本性中不可改变的一部分。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上明显具有攻击性，以快节奏的节拍和强劲的“军鼓”打击乐为背景。这种军事化的声音赋予了他的警告一种 commanding、近乎威胁的质感。这不是一个温和的提醒，而是对他情感极限的坚定、不容置疑的宣告。Tesfaye的人声演绎自信而 didactic，仿佛他正在就自己有缺陷性格的基本、不可改变的真相向Valerie说教。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“The Birds Pt. 1”深入探讨了具有严重回避型依恋风格（avoidant attachment style）或潜在自恋型人格特质的人的心理。“警告”某人你会伤害他们是一种复杂的防御机制。它允许个体保持情感距离，并继续其破坏性的行为模式，同时创造一个他们从一开始就“诚实”的叙事。这是一种预先免除自己对他们知道自己将要造成的情感伤害的内疚和责任的方式。</p></div></div></details>
+                <details><summary>The Birds, Pt. 2</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这是《Thursday》叙事中悲惨而暴力的 climax。它描绘了Valerie未能听从“Part 1”警告所带来的毁灭性后果。她的爱，没有得到回报，并遭遇背叛，导致了完全的精神崩溃，最终以她暗示的自杀告终。这是“wicked games”变得致命的时刻。</p><h3 class="analysis-heading">关键歌词分析</h3><p>这首歌被框定为一场绝望的对话。Valerie的恳求，“She said, 'Please, mercy me, let me fall out of love / Before you fuck her,'” 是对逃离自己情感的令人心碎的呼喊，承认了他的不忠和她的无力。主角最后的、冷酷的 dismiss 是“Look what you did... nobody forced your hand,” 这句台词将她情感毁灭和随后自杀的全部责任 squarely 地推到了她身上。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上可以说是The Weeknd整个音乐作品中最黑暗的。歌曲以一个女人哭泣的 chilling、场景内的声音开场，随后是 unmistakable 的枪支上膛和开火的咔哒声，设定了一种极其凄凉和明确的基调。这首歌围绕着Martina Topley-Bird的“Sandpaper Kisses”的采样构建，这是一个主题性的选择，完美地概括了主角情感的粗糙、痛苦的本质。音景缓慢、黑暗且充满回响。Tesfaye的人声表演阴沉而痛苦；他操纵自己的声音，在某些地方将其调高以代表Valerie的视角，创造出施虐者与其受害者之间 haunting 的对话。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“The Birds Pt. 2”是对持续心理虐待后导致自杀意念和行为的 brutal 和不妥协的描绘。它探讨了完全绝望、 desperation 和有毒、自恋关系所造成的最终创伤的主题。主角的反应——一种空洞的、假装同情和冷酷、指责性责备的混合体——揭示了他深刻的同理心缺失和他自己未被解决的心理健康问题的 terrifyingly 破坏力。</p></div></div></details>
+                <details><summary>Gone</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>在“The Birds Pt. 2”的创伤性高潮之后，“Gone”是一段长达八分钟、无结构的、堕入药物驱动深渊的旅程。这是叙事的逃生口。无法或不愿处理所发生事件的内疚和恐惧，主角完全屈服于沉醉，试图抹去自己的意识。这首歌的无形式性就是其功能：让听众沉浸在极度 high 状态下那种迷失方向、没有时间感的空虚中。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌词有意地漫无边际、重复，且常常难以辨认，反映了极度醉酒的认知状态。反复念叨的“I'm gone, I'm gone, I'm gone”是他意图逃离现实的明确宣告。据报道，这首歌是Tesfaye在重度醉酒时录制的一段即兴说唱，这赋予了它一种原始、无脚本且令人不安的真实感。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上迷幻且重复，建立在一个催眠般的节拍上，旨在诱导听众进入一种恍惚的状态。这首歌长达八分钟的 extended 长度和缺乏传统歌曲结构是故意的选择，旨在模拟在药物影响下发生的时间感知扭曲。Tesfaye的人声表演口齿不清且即兴；明显缺乏激情，取而代之的是一种麻木、随性的演绎，完美地反映了他僵直的、被药物麻痹的状态。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“Gone”是通过极端药物滥用进行逃避现实的纯粹、未加修饰的肖像。它代表了为避免面对创伤、内疚和无法忍受的情感痛苦而故意关闭自己心智的心理行为。这首歌的结构、制作和人声表演，是在音效上表现严重沉醉和解离精神状态的大师级作品，一种为了避免存在的痛苦而进行的暂时的自我死亡。</p></div></div></details>
+                <details><summary>Rolling Stone</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>在一个惊人的转变中，“Rolling Stone”打破了叙事的第四堵墙。主角的声音与艺术家Abel Tesfaye的声音融为一体。他直接向他 burgeoning 的粉丝群体讲话，承认他日益增长的名声将不可避免地改变他和他音乐的现实。这是一个脆弱的时刻，也是对他最初听众的一次恳求，希望他们能跟随他走上这段不确定的旅程。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌词起到了给粉丝的公开信的作用。歌词“So baby love me / Before they all love me” 是对他核心、早期观众的直接呼吁，请求他们在自己成为主流商品前给予忠诚。核心冲突体现在这两句中：“I hope I'm not different / But I know I've changed,” 这完美地表达了他对未来和名声腐化影响的恐惧和矛盾心理。他是一块“滚石”，无牵无挂，不断移动，他担心这不仅适用于他的人际关系，也适用于他的艺术身份。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上与混音带的其余部分有根本性的不同。它极简且精简，主要以一把原声吉他为特色。这种朴素、原始的乐器编排，旨在凸显歌词的真诚和脆弱。Tesfaye的人声表演亲密而直接，剥去了层层面具，以一种感觉像是他自己、未加修饰的声音说话。其效果就像是一次个人的、真诚的忏悔。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是对伴随成功和重大生活变化而来的特定焦虑的 poignant 探索。它深入探讨了对失去核心身份的恐惧、外部期望的压力，以及对自己最初的支持者在自己演变后是否会留下的不安全感。这是一个深刻不安全的时刻，他担心正是那使他独特的黑暗和神秘，会被主流成功所 sanitise，从而可能疏远他唯一感到有联系的社群。</p></div></div></details>
+                <details><summary>Heaven or Las Vegas</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首歌是对定义主角存在的中心二元性的一次主题性反思。他将“天堂”（代表潜在的爱、救赎与和平）与“拉斯维加斯”（一个明确的比喻，指代他深陷其中的地狱般、充满罪恶和享乐主义的生活方式）进行对比。这首歌是对不断拉扯他的两条道路的沉思。</p><h3 class="analysis-heading">关键歌词分析</h3><p>在一个罕见的背景故事时刻，歌词提到了缺乏“父爱”作为他破坏性行为的潜在根源，为可能塑造他当前病理的过去创伤提供了一瞥。天堂与“罪恶之城”的核心二分法，探讨了他对救赎的渴望与他对诱惑和自我毁灭的强大成瘾之间永恒的内心冲突。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上以其沉重、扭曲、受摇滚影响的吉他而著称，使其成为混音带中音效最具攻击性和力量的曲目之一。这种选择更硬朗的声音，强调了所描述的激烈内心冲突。Tesfaye的人声表演富有动感，被描述为既“美丽又硬核”，在沉重的乐器编排上空翱翔，混合了旋律的优雅和原始的力量。这首歌的标题也是对Cocteau Twins的开创性专辑的直接致敬，这是The Weeknd最重要的影响之一，进一步巩固了他的声音与另类摇滚世界之间的联系。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌直接触及了发展性创伤（缺席的父亲）作为主角当前精神状态潜在起源的概念。“天堂或拉斯维加斯”的选择，是一个强有力的隐喻，代表了成瘾者或任何与严重心理健康问题作斗争的人所进行的内心斗争。这是对健康、平静生活（“天堂”）的理性渴望与对熟悉、破坏性行为模式（“拉斯维加斯”）的强大、常常是压倒性的吸引力之间的冲突。</p></div></div></details>
+                <details><summary>Valerie (Bonus Track)</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>作为《Trilogy》发行的增补曲目，“Valerie”是这张混音带核心叙事的一个 haunting 和 essential 的尾声。这是对定义了《Thursday》的那个角色的直接致辞，一首充满了悔恨和对他所造成伤害的痛苦觉醒的歌曲。这首歌巩固了Valerie的重要性，将她从一个普通的受害者转变为他个人神话中一个被点名的、核心的人物，她的记忆将萦绕着他。</p><h3 class="analysis-heading">关键歌词分析</h3><p>这首歌是一首充满了内疚和持续的、有毒的占有欲的颂歌。他承认她的痛苦和他在其中的角色，但仍然有一种定义了他们关系的权力动态的暗流。歌词与他行为的后果作斗争，这与在“The Birds Pt. 2”中看到的推卸责任形成鲜明对比。</p><h3 class="analysis-heading">人声表现与制作</h3><p>这首歌被广泛认为是Tesfaye最强大、最富情感的人声表演之一。在歌曲的后半部分，他持续、高亢的“Oh Valerie”的哭喊，是一个纯粹、未加修饰的人声痛苦时刻，被描述为既“萦绕心头而又美丽”。他演绎中的原始情感，早期就频繁地被拿来与Michael Jackson比较。制作上 dramatic 且充满情感，构建到一个强大的高潮，完美地支持了人声表演中原始、绝望的能量。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“Valerie”是在不可逆转的伤害造成后，内疚和悔恨显现的声音。这是一个深刻的、尽管是迟来的同理心时刻。这首歌的 haunting 性质表明，Valerie的记忆，以及他在她悲惨结局中的罪责，将成为他心灵中一个永久的固定物。她变成了一个幽灵，一个他破坏能力的象征，也是他将带入三部曲最后一幕的核心心理包袱和创伤的一部分。</p></div></div></details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Echoes of Silence -->
+    <section id="eos" class="section" data-color="#ef4444" data-gradient="linear-gradient(to right, #ef4444, #b91c1c, #ef4444)">
+        <img src="https://i.postimg.cc/CM41zNdP/favorite-pic-from-the-trilogy-era-v0-8tag4z5ad20d1.jpg"
+             alt="A grainy, high-contrast photo of a person's hands amidst white and black balloons." class="background-image"
+             onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/333333?text=Image+Not+Found';">
+        <div class="vignette"></div>
+        <div class="content-wrapper">
+            <div class="text-center pt-16">
+                <h1 class="text-5xl md:text-7xl fancy-title title-eos reveal reveal-1">Echoes of Silence</h1>
+                <p class="text-lg text-gray-300 mt-4 max-w-xl mx-auto reveal reveal-2">最后一幕是最黑暗、最荒凉的篇章。派对的享乐主义诱惑早已消失，有毒的关系已化为尘土和幽灵，主角被彻底孤立，面对着他在前两张混音带中一直试图逃避的深刻空虚。</p>
+                <img src="https://t2.genius.com/unsafe/1458x0/https%3A%2F%2Fimages.genius.com%2Fa83a29dd26a6e4fe50bba0ef25c7bb19.1000x1000x1.png"
+                     alt="Echoes of Silence Album Art"
+                     class="w-40 h-40 md:w-48 md:h-48 album-art reveal reveal-3"
+                     onerror="this.onerror=null;this.src='https://placehold.co/256x256/111111/555555?text=EOS';">
+            </div>
+            <div class="song-list mt-8 reveal reveal-4">
+                <details><summary>D.D.</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这张混音带以一首Michael Jackson的“Dirty Diana”的翻唱开场，这是一个策略性的选择，立即设定了一种防御性和偏执的基调。在《Thursday》的毁灭性事件之后，他显然是反派，而主角则通过重新诠释一首关于掠夺性女粉丝的歌曲来开始这最后一幕。这种叙事选择起到了心理投射（psychological projection）的作用，试图将自己重塑为一个被操控世界的受害者，从而转移对自己行为的巨大内疚。</p><h3 class="analysis-heading">关键歌词分析</h3><p>虽然歌词属于Michael Jackson，但它们在《Echoes of Silence》开头的放置，赋予了它们在The Weeknd叙事中一个新的、特定的背景。“Dirty Diana”成了他在名利场中遇到的所有有毒、交易式女性的替身，他认为这个世界在利用和抛弃他。这是他表达“这不是我的错；是这个世界让我变成这样”的方式。</p><h3 class="analysis-heading">人声表现与制作</h3><p>Tesfaye的人声表演是对他的偶像Michael Jackson的直接而有力的致敬。他捕捉了原作的能量和攻击性，同时注入了自己标志性的黑暗、神秘风格。由Illangelo操刀的制作，将原作已经很黑暗的摇滚风格变得更加“黑暗”和“肮脏”。鼓声沉重且带有法兹效果，整体氛围险恶，无缝地融入了《Trilogy》已建立的音效调色板中。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是心理投射作为一种防御机制的教科书式例子。无法面对自己 monstrous 的行为和与Valerie命运相关的内疚，主角通过将责任外部化来开始他的最后一章。他将自己重塑为掠夺性“Diana”的猎物，这是一个象征着他认为正在腐化他的名声和女性的形象。这是对承担责任的拒绝，是在面对自身罪责时绝望地试图维持一种受害者感。</p></div></div></details>
+                <details><summary>Montreal</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>在“D.D.”的防御姿态之后，“Montreal”标志着向内省和内疚的突然而令人惊讶的转向。这首歌是在蒙特利尔录制的，Tesfaye明确地将这座城市与他生活中“许多黑暗”联系在一起，它作为对他情感创伤和他自我承认的无爱能力的原始忏悔。</p><h3 class="analysis-heading">关键歌词分析</h3><p>这里的叙事与他通常的掠夺性动态形成了逆转。他讲述了一个女孩的故事，她太晚意识到他实际上爱着她，但那时他毁灭性的生活方式已经使真诚的连接变得不可能。这首歌突出地采样了法国歌手France Gall的“Laisse Tomber les Filles”。歌词翻译为“让女孩们倒下”或“别再玩弄女孩了”，作为对他自己对女性粗心和破坏性对待的 haunting、多语言的评论。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上以Illangelo的“雷鸣般的贝斯”和“嘎嘎作响的军鼓”为特色，创造出一种强大但深沉忧郁的音景，反映了歌曲 somber 的主题。Tesfaye的人声表演充满了 palpable 的绝望和渴望。它被描述为“克制的”，仿佛他正在努力表达自己的悔恨，几乎在唱歌时吞下了话语。这种演绎使他的忏悔感觉比他通常自信的 crooning 更诚实和痛苦。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“Montreal”是一个深刻自我反思和罕见承认内疚的时刻。主角与他的情感疏离作斗争，并承认那些使他无法建立健康、充满爱的关系的自我毁灭模式。这是《Trilogy》中为数不多的他直接为自己造成的痛苦承担责任的时刻之一，这是他自恋盔甲上的一道裂缝，揭示了其下根深蒂固的悔恨。</p></div></div></details>
+                <details><summary>Outside</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>叙事再次转向诱惑，但基调已变。 《House of Balloons》的自信已荡然无存，取而代之的是一种绝望感和近乎阴险的控制欲。他试图引诱一个女人进入他 cloistered 的世界，一个他暗示她既无法也不愿离开的世界。</p><h3 class="analysis-heading">关键歌词分析</h3><p>核心歌词，“Once I'm finished with you, you won't wanna go outside,” 充满了黑暗、模糊的含义。表面上，这是对他性能力的吹嘘。然而，它也带有一种更 sinister 的暗示：他将创造一种如此完全的心理依赖状态，以至于她会变得患上广场恐惧症，她的整个世界将缩小到他们关系的 confines。歌曲结尾反复的指示，“baby, go outside,” 可以被解释为最后的、不屑一顾的命令，或者，更 chillingly 地，作为她从这次经历中解离的指代，她的思想“走出”她的身体以逃避这一刻的强度。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上缓慢、诱人且富有氛围感，大量使用混响和精心的节奏安排，增强了这首歌 intimate 但不安的情绪。Tesfaye的人声表演在技术上令人印象深刻且 alluring，一种“火辣”的演绎，使他控制性的提议听起来危险地吸引人。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是对控制、痴迷和心理操控的黑暗探索。让伴侣“待在室内”的欲望，可以被解释为主角自身严重害怕被抛弃的一种表现。为了防止被抛弃，他寻求完全占有和控制他的伴侣，有效地在情感和心理上囚禁她。这首歌模糊了强烈激情与一种深度病态的支配需求之间的界限。</p></div></div></details>
+                <details><summary>XO / The Host</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首分为两部分的歌曲，深入探讨了主角世界及其“XO”团队的剥削机制。第一部分“XO”，是加入他社群的诱人邀请。第二部分“The Host”，则是一段冷酷、掠夺性的独白，他揭示了那个世界的严酷现实，将自己定位为引导新成员走向毁灭的操控性向导。这首歌是“Initiation”恐怖事件的直接叙事前奏。</p><h3 class="analysis-heading">关键歌词分析</h3><p>在“The Host”中，主角冷酷地观察着这种生活方式对一个新受害者的后果：“You look so depressed, and you're filled with regret”。然后，他强调了她的现实问题——被驱逐、失业、花光所有钱——并愤世嫉俗地将他的“XO”团队呈现为她唯一剩下的家庭，一个只会延续她毁灭的有毒支持系统。他变成了“The Host”，一个以他人绝望为食的寄生实体。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上以“回响的电子乐和像枪声一样爆裂的鼓点”为特色，创造出一种戏剧性和险恶的氛围，强调了他提议的危险性。在更欢快的“XO”和朴素、极简的“The Host”之间的节拍转换，标志着叙事从派对诱人表象到主人冷酷、掠夺性现实的转变。Tesfaye的人声表演冰冷且“嘲讽”，一种“对一个生活失控的女粉丝的不屑”，以零同理心传达。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是对一个捕食弱者的捕食者的 chilling 描绘。“Host”人格在摧毁他人中找到权力和认同。他专门针对那些抑郁和充满悔恨的人，在功能更像一个邪教的“XO”社群中为他们提供一种归属感。这是一个强有力的隐喻，说明了成瘾和有毒的社交圈如何创造一个自我延续的绝望循环，通过成为个体唯一感知的支持来源来困住他们。</p></div></div></details>
+                <details><summary>Initiation</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>“Initiation”是整个《Trilogy》的道德事件视界。它以图形化和骇人听闻的方式描绘了一个女人被下药并被胁迫进行群交，作为进入主角核心圈子的“入会仪式”。这是无可挽回的地步，角色的邪恶在其最极端和不可原谅的形式下被赤裸裸地揭示出来。</p><h3 class="analysis-heading">关键歌词分析</h3><p>核心的、可怕的提议以令人不寒而栗的漠不关心传达：“I got a test for you / You said you want my heart... Well, baby you can have it all / There's just one thing / You gotta meet my boys”。其含义显而易见：她的“入会仪式”要求她与他的整个团队发生关系。他冷静客观地管理她的醉酒程度以确保她的顺从，警告她，“Heart rate's low / Put that rum down you don't wanna die tonight,” 这句台词揭示了他关心的不是她的安危，而是她身体的可用性。</p><h3 class="analysis-heading">人声表现与制作</h3><p>这首歌最显著的特点是极端的人声处理。Tesfaye的声音不断地、不规律地被调高和调低，毫无预警地加速和减速。这种令人迷失方向的音效效果是天才之举；它迫使听众从受害者的角度体验事件，在音效上表现了她被下药、恐惧和扭曲的精神状态。制作上同样令人不安，节奏“嘈杂”，旋律被“Auto-Tune效果故意破坏”，创造出一个与所描述行为一样刺耳和侵犯性的音景。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是对药物辅助性侵犯的直接和不妥协的描绘。它探讨了精神病态最黑暗的方面：完全缺乏同理心，使用胁迫和控制作为权力工具，以及对人的物化。虽然叙事是从施暴者的角度讲述的，但制作和人声的选择创造了一种极其发自肺腑的创伤感，这种创伤正施加在受害者身上，使其成为对性暴力有力的、尽管是极度令人不安的评论。</p></div></div></details>
+                <details><summary>Same Old Song</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>在“Initiation”的极端黑暗之后，“Same Old Song”提供了一个对名声后果的痛苦、愤世嫉俗的反思。主角 dismiss 了一个在他成功后回来的前情人，认为她毫无新意和可预测——“same old song”。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌词围绕着一个新晋成名的经典套路构建：“You never thought that I would ever go far... But now you're back... 'cause I'm on”。然而，Tesfaye传达这种情绪时并非带着胜利感，而是带着深刻的怨恨和厌恶女性的蔑视。他疲惫而幻灭，被困在一个肤浅关系和可预测动机的重复循环中。他认为每个人，包括他自己，都在上演着“same old song”。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上讽刺地流畅且更符合传统R&B，这种音效选择与歌曲拒绝可预测模式的主题形成对比。Tesfaye的人声表演充满了明显的蔑视和厌倦，他以一种疲惫的优越感的语气 dismiss 了那个女人。这首歌以说唱歌手Juicy J一段超现实、念白的结尾部分结束，为整个过程增添了一层黑暗、近乎喜剧的荒诞感。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌是一个被愤世嫉俗毒害的心灵的肖像。成功并未给主角带来幸福或平静，而是带来了根深蒂固的怨恨和无法信任任何人动机的无能。他正遭受一种情感倦怠，每一次互动都感觉重复而无意义。他被困在自己制造的循环中，并将这种强烈的沮丧和自我厌恶投射到接近他的女性身上，无法将她们视为除了他自己麻木的世界观的反映之外的任何东西。</p></div></div></details>
+                <details><summary>The Fall</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>在这首歌中，主角完全面对并接受了自己垮台的不可避免性。在达到他享乐主义和破坏性生活方式的绝对顶峰后，他感觉到一场灾难性的崩溃不仅迫在眉睫，而且是必要的。他不再逃避自己的命运，而是拥抱它。</p><h3 class="analysis-heading">关键歌词分析</h3><p>歌词是持续成功的大胆预测和对后果的 grim 意识的奇怪混合。他似乎欢迎他即将到来的“垮台”，将其视为他悲剧叙事的合乎逻辑甚至可能是可取的结论。有一种感觉，他相信自己的神话需要一个 dramatic、自我毁灭的结局。</p><h3 class="analysis-heading">人声表现与制作</h3><p>由有影响力的制作人Clams Casino和Illangelo合作的制作，创造出一种标志性的“朦胧的黑暗”音景。这首歌由沉重的、“嘎嚓作响的节拍和不祥的、唱诗班般的人声”驱动，创造出一种镇静、荒凉和近乎葬礼般的氛围。Tesfaye的人声表演以“钢铁般的决心”传达，这是一个“深知谷底滋味”并且完全不害怕回到那里的男人的声音。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“The Fall”体现了一种宿命论抑郁和被动自我毁灭的状态。主角不再与他的心魔作斗争；他正积极地投入自己的毁灭。这代表了一种深刻绝望的心理状态，个体放弃了康复的可能性，转而接受，甚至浪漫化自己的自我毁灭。这是一个已经停止战斗，并决定一路随波逐流到底的人的声音。</p></div></div></details>
+                <details><summary>Next</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首歌探讨了主角痛苦的核心引擎：对“更多”的无尽、不满足的追求。他在心理上无法承诺或找到满足感，因为他的心思总是在“下一个”女人、“下一个”快感、“下一个” fleeting 的刺激上。这首歌是一个被困在享乐主义跑步机上的男人的肖像。</p><h3 class="analysis-heading">关键歌词分析</h3><p>核心歌词，“You just want me 'cause I'm next,” 是他向那些因他的名声而追求他的女性提出的 cynical 指责。然而，这句台词极具反讽意味，因为它完美地描述了他自己的心态。他也只对她们感兴趣，因为她们是永无止境系列中的“下一个”征服对象。他被困在一个消费的循环中，将药物和人都视为可抛弃的商品。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上流畅但深沉忧郁，乐器编排强调了空洞、无乐重复的主题。Tesfaye的人声表演传达了一种 weary 的 restlessness。这是一个不断寻找但早已忘记自己在寻找什么的人的声音，只被自己永不满足的欲望的 momentum 驱动。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>“Next”是对成瘾本质的有力隐喻，特别是“chasing the dragon”的概念。“下一个”快感，“下一个”刺激，永远不如前一个满足，导致了一个无尽且日益绝望的寻求新奇以逃避普遍且加深的空虚和无聊感的循环。它描绘了一种生活在 perpetual 不满足状态下的生活，未来只承诺了更多的同样。</p></div></div></details>
+                <details><summary>Echoes of Silence</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首同名曲目是整个《Trilogy》的情感高潮和最后的、毁灭性的忏悔。剥去所有虚张声势、矫揉造作和攻击性，主角被彻底孤立，乞求一个女人不要离开他去面对他自己的痛苦。这是怪物消融，揭示其下 terrified、破碎的男人的时刻。</p><h3 class="analysis-heading">关键歌词分析</h3><p>在最后一次推卸责任的行为中，他称那个女人为“masochist”，因为她一直和他在一起，这是他将她框定为她自己痛苦的自愿参与者的最后努力。然而，这一指责立即被他自己 pathetic、绝望的恳求完全 undercut：“So baby don't go home / I don't wanna spend tonight alone”。这是他在整个29首歌的叙事中最诚实、最脆弱、最人性化的时刻。所有的派对、毒品和性，都是为了抵御这一个简单的恐惧。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作被剥离到最基本的要素。它是一首“带有浓重混响的钢琴民谣”，仅由一些稀疏、哀伤的弦乐伴奏。这种极简的编排创造出一种朴素、冷酷、空旷的空间感。标题中的“echoes of silence”是他深刻情感空虚的音效体现。Tesfaye的人声表演是脆弱性的巅峰之作。这是一首“萦绕心头的民谣”，他的声音颤抖着，充满了“相当传统的悲剧”——简单、原始和普遍的孤独之痛。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这是绝对的谷底。在三张混音带的表演性虚无主义、掠夺性行为和绝望逃避之后，整个人格崩溃了。这首歌是对 crippling 的被抛弃恐惧和他的整个生活方式所掩盖的深刻抑郁的原始描绘。他最终留下的寂静，正是他一直以来逃避的空虚。他成了自己创造物的囚徒，被一个缺乏真诚连接的生活的回声所困扰。</p></div></div></details>
+                <details><summary>Till Dawn (Here Comes The Sun) (Bonus Track)</summary><div class="details-content"><div class="details-content-inner"><h3 class="analysis-heading">叙事角色</h3><p>这首增补曲目为《Trilogy》提供了一个略显乐观，但仍深具模糊性的结局。标题中对The Beatles的引用，暗示了在同名曲目的深刻黑暗之后的新开始和希望的可能性。然而，歌词中仍包含着临时连接的熟悉主题，使叙事保持开放。</p><h3 class="analysis-heading">关键歌词分析</h3><p>“太阳”的到来可以有两种解释。它可能是一个真正新黎明的象征，一个希望的时刻和走向康复之路的开始。或者，它可能仅仅标志着又一个黑暗绝望之夜的结束，暗示着整个毁灭性循环即将再次开始。这种模糊性是故意的，让主角的最终命运不确定。</p><h3 class="analysis-heading">人声表现与制作</h3><p>制作上明显比《Echoes of Silence》的大部分曲目更明亮、更旋律化。压抑、幽闭恐怖的氛围略有提升，取而代之的是一种虽然仍带忧郁，但包含一丝希望的声音，与“Here Comes The Sun”的副标题相符。Tesfaye的人声表演不像前一首歌那样绝望和破碎，带有一种更坚定、尽管仍显疲惫的基调。</p><h3 class="analysis-heading">与心理健康的关联</h3><p>这首歌提供了一线希望，暗示了从“Echoes of Silence”中描绘的深度抑郁状态中走出的可能性。它提出了任何康复旅程核心的关键问题：这是一个真正的转折点，一个走向治愈和新生活的真正一步吗？或者，这仅仅是一个短暂的喘息，一个在不可避免地复发到熟悉的黑暗之前的暂时清醒时刻？《Trilogy》的结尾没有给出答案，而是将这个脆弱、不确定的问题悬在空中。</p></div></div></details>
+            </div>
+        </div>
+    </section>
+    
+    <section id="epilogue" class="section" data-color="#a7a7a7" data-gradient="linear-gradient(to right, #5a5a5a, #a7a7a7, #5a5a5a)">
+        <img src="https://i.postimg.cc/1tSfgYSt/67c10c9cafeca5dfdad75f94a37480c6.jpg"
+             alt="A moody, black and white photo of The Weeknd." class="background-image"
+             onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/333333?text=Image+Not+Found';">
+        <div class="vignette"></div>
+        <div class="top-vignette"></div>
+        <div class="content-wrapper">
+             <div class="text-center py-8">
+                 <h1 class="text-5xl md:text-7xl fancy-title title-epilogue mb-4 pb-2 reveal reveal-1">终章</h1>
+                 <h2 class="text-xl sm:text-2xl md:text-3xl text-gray-300 mt-6 reveal reveal-2">阴影的遗产</h2>
+                 <div class="mt-6 max-w-3xl mx-auto text-left reveal reveal-3 bg-black bg-opacity-5 backdrop-blur-md border border-white border-opacity-10 rounded-lg p-6 sm:p-8 text-gray-400">
+                     <p class="mb-4">The Weeknd的《Trilogy》的叙事弧线是一部精湛的现代悲剧，记录了一段完整而毁灭性的自我毁灭之旅。主角在《House of Balloons》开始时是一个自信、近乎超自然的捕食者，将毒品、性和他自己的神秘感作为控制工具。他是他黑暗领域的主人。通过《Thursday》的有针对性的残忍和《Echoes of Silence》的空洞绝望，这个人格被系统性地解构。到同名曲目最后的绝望恳求时，他不再是捕食者，而是最终的猎物——被他的成瘾所追捕，被他的名声所囚禁，并被他自己造成的难以承受的孤独所吞噬。</p>
+                     <p class="mb-4">这个完整的弧线巩固了《Trilogy》作为一部批判而非庆祝作品的核心目的。它细致地拆解了享乐主义摇滚明星的光鲜神话，揭示了其外表之下是一个“毫无乐趣”的存在，被“不可动摇的虚无主义”和深刻的精神痛苦所定义。《Trilogy》的世界不是一个令人向往的幻想；它是一个心理恐怖故事，一个关于追求没有连接的感觉所付出的真实代价的警示故事。</p>
+                     <p class="mb-4">这一叙事的音乐遗产同样深远。它大胆地融合了黑暗、氛围感的制作，非传统的独立和后朋克采样，以及残酷诚实、内省的歌词，为R&B锻造了一种新的音效语言。《Trilogy》的声音直接影响了一代艺术家，从像Drake这样的同时代人到像PARTYNEXTDOOR和Brent Faiyaz这样的后继者，他们都采用了其忧郁、脆弱和音效上冒险的模板。它使该流派内一种更黑暗、更复杂的表达形式合法化，证明了R&B可以成为探索人类心灵最 bleak 角落的载体。</p>
+                     <p>最终，《Trilogy》是The Weeknd艺术人格的核心起源故事。那个 monstrous、虚无主义的角色与幕后受伤、脆弱的男人之间深刻、无休止的冲突，在这三十首歌中如此有力地建立起来，成为他整个后续事业的核心引擎。从《Kiss Land》的电影式焦虑到《After Hours》的血腥名人讽刺，再到《Dawn FM》的炼狱电台，Abel Tesfaye艺术旅程的每一章都是试图理解、逃避或与他在2011年创造的那个幽灵和解的尝试。《Trilogy》不仅仅是他的首秀；它是21世纪最引人入胜、最充满矛盾的艺术叙事之一的心理蓝图。</p>
+                 </div>
+                 <footer class="footer reveal reveal-4">
+                    <p>&copy; 2025 Encore. All Rights Reserved.</p>
+                </footer>
+             </div>
+        </div>
+    </section>
+
+    <section id="samples" class="section" data-color="#64748b" data-gradient="linear-gradient(to right, #94a3b8, #cbd5e1, #94a3b8)">
+        <img src="https://i.postimg.cc/1tSfgYSt/67c10c9cafeca5dfdad75f94a37480c6.jpg"
+             alt="A moody, black and white photo of The Weeknd." class="background-image"
+             onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/333333?text=Image+Not+Found';">
+        <div class="vignette"></div>
+        <div class="top-vignette"></div>
+        <div class="content-wrapper">
+             <div class="text-center py-8">
+                 <h1 class="text-5xl md:text-7xl fancy-title title-samples mb-4 pb-2 reveal reveal-1">音效蓝图</h1>
+                 <p class="text-lg text-gray-300 mt-4 max-w-xl mx-auto reveal reveal-2">在《Trilogy》中使用的大胆和非传统的采样是其独特身份的基础，创造了流派的交叉融合，为R&B锻造了一种新的声音。</p>
+                 <div class="samples-grid reveal reveal-3 mx-auto">
+                     <div class="sample-item">
+                         <p class="sample-item-title">What You Need</p>
+                         <p class="sample-item-artist">采样 "Rock the Boat" by Aaliyah</p>
+                     </div>
+                     <div class="sample-item">
+                         <p class="sample-item-title">House of Balloons / Glass Table Girls</p>
+                         <p class="sample-item-artist">采样 "Happy House" by Siouxsie and the Banshees</p>
+                     </div>
+                     <div class="sample-item">
+                         <p class="sample-item-title">The Party & The After Party</p>
+                         <p class="sample-item-artist">采样 "Master of None" by Beach House</p>
+                     </div>
+                     <div class="sample-item">
+                         <p class="sample-item-title">Loft Music</p>
+                         <p class="sample-item-artist">采样 "Gila" by Beach House</p>
+                     </div>
+                     <div class="sample-item">
+                         <p class="sample-item-title">The Knowing</p>
+                         <p class="sample-item-artist">采样 "Cherry-Coloured Funk" by Cocteau Twins</p>
+                     </div>
+                     <div class="sample-item">
+                         <p class="sample-item-title">Life of the Party</p>
+                         <p class="sample-item-artist">采样 "Drugs in My Body" by Thieves Like Us</p>
+                     </div>
+                     <div class="sample-item">
+                         <p class="sample-item-title">The Birds Pt. 2</p>
+                         <p class="sample-item-artist">采样 "Sandpaper Kisses" by Martina Topley-Bird</p>
+                     </div>
+                     <div class="sample-item">
+                         <p class="sample-item-title">Montreal</p>
+                         <p class="sample-item-artist">采样 "Laisse Tomber les Filles" by France Gall</p>
+                     </div>
+                 </div>
+             </div>
+             <footer class="footer reveal reveal-4">
+                 <p>&copy; 2025 Encore. All Rights Reserved.</p>
+             </footer>
+        </div>
+    </section>
+
+</div>
+
+<script>
+// --- Pre-loader Logic ---
+window.addEventListener('load', () => {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        setTimeout(() => {
+            preloader.classList.add('hidden');
+        }, 500);
+    }
+});
+
+// --- Main Page Logic ---
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Element Selections ---
+    const body = document.body;
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navButtons = document.querySelectorAll('.nav-bar-container button');
+    const container = document.querySelector('.container');
+    const contentWrappers = document.querySelectorAll('.content-wrapper');
+    const detailsElements = document.querySelectorAll('details');
+    const pageNav = document.getElementById('page-nav');
+    const dragNavTitlesList = document.getElementById('drag-nav-titles-list');
+    const dragNavTitleItems = Array.from(dragNavTitlesList.querySelectorAll('.drag-nav-title'));
+    
+    let isScrolling = false;
+    
+    // --- Album Cover Click Logic ---
+    const albumLinks = document.querySelectorAll('.album-choice-link');
+    albumLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href');
+            const target = document.querySelector(targetId);
+            if(target) {
+                 isScrolling = true;
+                container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+                setTimeout(() => { isScrolling = false; }, 1000);
+            }
+        });
+    });
+
+    // --- Intersection Observer for Active States ---
+    const observer = new IntersectionObserver((entries) => {
+        if (isDragging) return;
+        entries.forEach(entry => {
+            const sectionId = entry.target.id;
+            const correspondingNav = document.querySelector(`.nav-bar-container button[data-target="#${sectionId}"]`);
+            const correspondingTitle = document.querySelector(`.drag-nav-title[data-target="#${sectionId}"]`);
+            
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                navButtons.forEach(b => b.classList.remove('active'));
+                if (correspondingNav) {
+                    correspondingNav.classList.add('active');
+                }
+                dragNavTitleItems.forEach(item => {
+                    item.classList.remove('active-snap');
+                    item.style.backgroundImage = 'none';
+                    item.style.color = '';
+                });
+                if(correspondingTitle) {
+                    correspondingTitle.classList.add('active-snap');
+                    correspondingTitle.style.backgroundImage = entry.target.dataset.gradient || 'none';
+                }
+            } else {
+                entry.target.classList.remove('active');
+            }
+        });
+    }, { 
+        root: container,
+        threshold: 0.7
+    });
+
+    sections.forEach(section => observer.observe(section));
+
+    // --- Scroll Chaining Logic for Content Wrappers ---
+    contentWrappers.forEach(wrapper => {
+        wrapper.addEventListener('wheel', (e) => {
+            if (isScrolling) return;
+
+            const { scrollTop, scrollHeight, clientHeight } = wrapper;
+            const currentSection = wrapper.closest('.section');
+            const currentIndex = sections.indexOf(currentSection);
+
+            if (e.deltaY > 0 && (scrollTop + clientHeight >= scrollHeight - 5)) {
+                e.preventDefault();
+                const nextIndex = currentIndex + 1;
+                if (nextIndex < sections.length) {
+                    isScrolling = true;
+                    container.scrollTo({ top: sections[nextIndex].offsetTop, behavior: 'smooth' });
+                    setTimeout(() => { isScrolling = false; }, 1000);
+                }
+            } else if (e.deltaY < 0 && scrollTop === 0) {
+                e.preventDefault();
+                const prevIndex = currentIndex - 1;
+                if (prevIndex >= 0) {
+                    isScrolling = true;
+                    container.scrollTo({ top: sections[prevIndex].offsetTop, behavior: 'smooth' });
+                    setTimeout(() => { isScrolling = false; }, 1000);
+                }
+            }
+        }, { passive: false });
+    });
+
+    // --- Smooth Details Collapse/Expand Animation ---
+    detailsElements.forEach(details => {
+        const summary = details.querySelector('summary');
+        const content = details.querySelector('.details-content');
+
+        if (summary && content) {
+            summary.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (details.open) {
+                    content.style.maxHeight = '0px';
+                    content.style.paddingBottom = '0px';
+                    details.setAttribute('data-closing', 'true');
+                    setTimeout(() => {
+                        details.removeAttribute('open');
+                        details.removeAttribute('data-closing');
+                    }, 500);
+                } else {
+                    details.setAttribute('open', '');
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    content.style.paddingBottom = '1.5rem';
+                }
+            });
+            content.style.transition += ', padding-bottom 0.5s cubic-bezier(0.25, 0.8, 0.5, 1)';
+        }
+    });
+
+    // --- Drag-to-Scroll & Click Navigation Logic ---
+    let isDragging = false;
+    let startY;
+    let startScrollTop;
+    let moved = false;
+    let rafId; 
+
+    const dragStart = (e) => {
+        e.preventDefault();
+        isDragging = true;
+        moved = false; 
+        isScrolling = true;
+        startY = e.touches ? e.touches[0].pageY : e.pageY;
+        startScrollTop = container.scrollTop;
+        
+        body.classList.add('is-dragging');
+        container.style.scrollSnapType = 'none';
+        
+        dragNavTitleItems.forEach(item => item.classList.remove('active-snap'));
+        updateActiveDragTitle();
+
+        document.addEventListener('mousemove', dragMove, { passive: false });
+        document.addEventListener('touchmove', dragMove, { passive: false });
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchend', dragEnd);
+    };
+
+    const dragMove = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        moved = true;
+        
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+            const y = e.touches ? e.touches[0].pageY : e.pageY;
+            // FIX: Corrected scroll direction and increased sensitivity
+            const deltaY = y - startY;
+            container.scrollTop = startScrollTop +deltaY * 13;
+            updateActiveDragTitle();
+        });
+    };
+
+    const dragEnd = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        cancelAnimationFrame(rafId);
+        body.classList.remove('is-dragging');
+        
+        if (!moved) {
+            const clickedButton = e.target.closest('button');
+            if (clickedButton && clickedButton.dataset.target) {
+                const target = document.querySelector(clickedButton.dataset.target);
+                if (target) {
+                    container.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+                    setTimeout(() => {
+                        container.style.scrollSnapType = 'y mandatory';
+                        isScrolling = false;
+                    }, 800);
+                }
+            } else {
+                snapToNearestSection();
+            }
+        } else {
+            snapToNearestSection();
+        }
+
+        document.removeEventListener('mousemove', dragMove);
+        document.removeEventListener('touchmove', dragMove);
+        document.removeEventListener('mouseup', dragEnd);
+        document.removeEventListener('touchend', dragEnd);
+    };
+
+    const updateActiveDragTitle = () => {
+        const scroll = container.scrollTop;
+        const containerHeight = container.clientHeight;
+
+        sections.forEach((section, index) => {
+            const title = dragNavTitleItems[index];
+            if (!title) return;
+
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            
+            const viewCenter = scroll + containerHeight / 2;
+            const sectionCenter = sectionTop + sectionHeight / 2;
+            const distance = Math.abs(viewCenter - sectionCenter);
+
+            const progress = Math.min(1, distance / containerHeight);
+            const scale = 1.5 - (progress * 0.5);
+            const opacity = 1 - progress;
+
+            title.style.transform = `scale(${scale})`;
+            
+            if (opacity > 0.1) {
+                title.style.backgroundImage = section.dataset.gradient;
+                title.style.backgroundClip = 'text';
+                title.style.webkitBackgroundClip = 'text';
+                title.style.color = `rgba(255, 255, 255, ${opacity})`; 
+                title.style.textShadow = `0 0 15px rgba(255, 255, 255, ${opacity * 0.5})`;
+            } else {
+                title.style.backgroundImage = 'none';
+                title.style.color = '#6b7280';
+                title.style.textShadow = 'none';
+            }
+        });
+    };
+    
+    const snapToNearestSection = () => {
+        const currentScroll = container.scrollTop;
+        const viewportCenter = currentScroll + container.clientHeight / 2;
+        
+        let closestSection = sections[0];
+        let smallestDistance = Math.abs(viewportCenter - (closestSection.offsetTop + closestSection.clientHeight / 2));
+
+        sections.forEach(section => {
+            const sectionCenter = section.offsetTop + section.clientHeight / 2;
+            const distance = Math.abs(viewportCenter - sectionCenter);
+            if (distance < smallestDistance) {
+                smallestDistance = distance;
+                closestSection = section;
+            }
+        });
+
+        container.scrollTo({
+            top: closestSection.offsetTop,
+            behavior: 'smooth'
+        });
+
+        setTimeout(() => {
+            container.style.scrollSnapType = 'y mandatory';
+            isScrolling = false;
+            sections.forEach(s => s.classList.remove('active'));
+            closestSection.classList.add('active');
+            
+            const correspondingNav = document.querySelector(`.nav-bar-container button[data-target="#${closestSection.id}"]`);
+            navButtons.forEach(b => b.classList.remove('active'));
+            if (correspondingNav) {
+                correspondingNav.classList.add('active');
+            }
+        }, 800);
+    };
+
+    pageNav.addEventListener('mousedown', dragStart);
+    pageNav.addEventListener('touchstart', dragStart);
+
+    // --- Custom Audio Player Logic ---
+    const audio = document.getElementById('trilogy-audio');
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    const seekBarContainer = document.getElementById('seek-bar-container');
+    const seekBarProgress = document.getElementById('seek-bar-progress');
+    const currentTimeEl = document.getElementById('current-time');
+    const durationEl = document.getElementById('duration');
+
+    const formatTime = (timeInSeconds) => {
+        if (isNaN(timeInSeconds)) return '0:00';
+        const minutes = Math.floor(timeInSeconds / 60);
+        const seconds = Math.floor(timeInSeconds % 60);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    playPauseBtn.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+        } else {
+            audio.pause();
+        }
+    });
+    
+    audio.addEventListener('play', () => {
+        playIcon.classList.add('hidden');
+        pauseIcon.classList.remove('hidden');
+    });
+
+    audio.addEventListener('pause', () => {
+        playIcon.classList.remove('hidden');
+        pauseIcon.classList.add('hidden');
+    });
+
+    audio.addEventListener('timeupdate', () => {
+        const { currentTime, duration } = audio;
+        if (duration) {
+            const progressPercent = (currentTime / duration) * 100;
+            seekBarProgress.style.width = `${progressPercent}%`;
+            currentTimeEl.textContent = formatTime(currentTime);
+        }
+    });
+
+    audio.addEventListener('loadedmetadata', () => {
+        durationEl.textContent = formatTime(audio.duration);
+    });
+    
+    seekBarContainer.addEventListener('click', (e) => {
+        const rect = seekBarContainer.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const width = seekBarContainer.clientWidth;
+        const duration = audio.duration;
+        if (duration) {
+            audio.currentTime = (clickX / width) * duration;
+        }
+    });
+
+    audio.addEventListener('error', () => {
+        console.error("Audio file could not be loaded. Check the 'src' path.");
+        playPauseBtn.disabled = true;
+        playPauseBtn.style.opacity = '0.5';
+        seekBarContainer.style.pointerEvents = 'none';
+        durationEl.textContent = 'Error';
+    });
+
+    // --- Parallax Scrolling Effect for Backgrounds ---
+    container.addEventListener('scroll', () => {
+        if (isDragging) return;
+        const scrollTop = container.scrollTop;
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const bgImage = section.querySelector('.background-image');
+            
+            if (bgImage) {
+                const scrollInSection = scrollTop - sectionTop;
+                const parallaxOffset = scrollInSection * 0.2;
+                bgImage.style.transform = `scale(1.3) translateY(${parallaxOffset}px)`;
+            }
+        });
+    });
+
+    // --- Repeatable Content Reveal on Scroll ---
+    const detailObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+            } else {
+                entry.target.classList.remove('revealed');
+            }
+        });
+    }, {
+        root: container, 
+        rootMargin: "0px 0px -10% 0px",
+        threshold: 0.1
+    });
+
+    document.querySelectorAll('.song-list details').forEach(detail => {
+        detailObserver.observe(detail);
+    });
+});
+</script>
+
+</body>
+</html>
